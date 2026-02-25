@@ -26,24 +26,24 @@
             touch-action: none;
         }
 
-        /* 改用 Flexbox 自動分配空間，防止重疊 */
         .phone-container {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-evenly; /* 平均分配各元件間的距離 */
-            padding: env(safe-area-inset-top) 30px env(safe-area-inset-bottom) 30px;
+            /* 使用 space-around 讓頂部和底部留白更自然 */
+            justify-content: space-around; 
+            padding: env(safe-area-inset-top) 30px calc(20px + env(safe-area-inset-bottom)) 30px;
             box-sizing: border-box;
         }
 
-        /* 橡實動畫：縮小尺寸以騰出垂直空間 */
+        /* 放大圖片尺寸，佔據更多視覺空間 */
         .acorn-box {
-            width: 45%; 
-            max-width: 160px;
+            width: 60%; 
+            max-width: 200px;
+            flex-shrink: 0;
             animation: acorn-breathe 5s ease-in-out infinite;
-            flex-shrink: 0; /* 禁止圖片被擠壓 */
         }
 
         .acorn-box img {
@@ -53,38 +53,39 @@
 
         @keyframes acorn-breathe {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-5px) scale(1.03); }
+            50% { transform: translateY(-8px) scale(1.04); }
         }
 
+        /* 強化詩句字體與間距 */
         .poem-section {
             display: flex;
             flex-direction: column;
-            gap: 8px; /* 縮小行距適配 iPhone Mini */
+            gap: 15px; /* 增加行與行的間距 */
             color: var(--text-brown);
             text-align: center;
             flex-shrink: 0;
         }
 
         .poem-line {
-            font-size: 20px; /* 稍微縮小字體防止換行或擁擠 */
+            font-size: 26px; /* 顯著放大字體 */
             font-weight: 500;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.25em; /* 增加字距讓排版更優雅 */
+            line-height: 1.4;
         }
 
-        /* 圓形按鈕容器 */
+        /* 圓形按鈕 */
         .btn-container {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
-            padding-bottom: 20px;
         }
 
         .start-touch-point {
             background-color: var(--btn-transparent);
             border: 1px solid var(--btn-border);
-            width: 70px;  
-            height: 70px; 
+            width: 85px;  /* 稍微放大一點點按鈕 */
+            height: 85px; 
             border-radius: 50%;
             cursor: pointer;
             outline: none;
@@ -93,12 +94,11 @@
             align-items: center;
             color: var(--text-brown);
             font-family: 'cwTeXYen', sans-serif;
-            font-size: 16px;
-            animation: ripple-breathe 4s infinite ease-in-out;
+            font-size: 18px;
             position: relative;
+            animation: ripple-breathe 4s infinite ease-in-out;
         }
 
-        /* 波紋動畫 */
         .start-touch-point::after {
             content: "";
             position: absolute;
@@ -110,12 +110,12 @@
 
         @keyframes ripple-breathe {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            50% { transform: scale(1.1); }
         }
 
         @keyframes ripple-outer {
             0% { transform: scale(1); opacity: 0.6; }
-            100% { transform: scale(1.6); opacity: 0; }
+            100% { transform: scale(1.8); opacity: 0; }
         }
 
         .start-touch-point:active {
