@@ -51,7 +51,7 @@
             letter-spacing: 0.25em; line-height: 1.4;
         }
 
-        /* --- 核心：諮商風格按鈕 --- */
+        /* --- 輔導風格按鈕核心 --- */
         .btn-container {
             position: relative;
             display: flex;
@@ -75,8 +75,8 @@
             position: relative;
             z-index: 2;
             
-            /* 讓恢復原狀的過程也變得非常緩慢 (1.5s) */
-            transition: transform 1.5s cubic-bezier(0.2, 0.5, 0.3, 1), background-color 1.2s ease;
+            /* 基礎恢復曲線：緩慢且平滑 */
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 1.2s;
             animation: btn-breathe 4s infinite ease-in-out;
             -webkit-tap-highlight-color: transparent;
         }
@@ -102,28 +102,28 @@
             100% { transform: scale(1.8); opacity: 0; }
         }
 
-        /* --- 慢慢按下去 (不分裝置) --- */
+        /* --- 慢速下陷 (按住時) --- */
         .start-touch-point:active {
             transform: scale(0.88) !important; 
             background-color: rgba(93, 64, 55, 0.2) !important;
-            /* 按下去的過程長達 1 秒，營造受壓阻力感 */
-            transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+            /* 極慢下沉感 */
+            transition: transform 1.0s cubic-bezier(0.2, 0.5, 0.3, 1) !important;
         }
 
-        /* --- 慢慢彈返起 (放開後) --- */
+        /* --- 緩慢回彈並稍微擴大 (放開後) --- */
         .start-touch-point.is-pressing {
             animation: none !important; 
-            /* 回彈到幾乎原狀，展現生命力 */
-            transform: scale(1.02) !important; 
+            /* 回彈並舒展到比原始略大一點 1.05 */
+            transform: scale(1.05) !important; 
             background-color: rgba(93, 64, 55, 0.12);
-            opacity: 0.8;
-            /* 彈起過程持續 1.5 秒，非常輕柔 */
+            opacity: 0.85;
+            /* 1.5秒緩慢彈回並張開的感覺 */
             transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.4, 1) !important;
         }
         
         .start-touch-point.is-pressing::after {
             opacity: 0;
-            transition: opacity 1s ease;
+            transition: opacity 1.2s ease;
         }
     </style>
 </head>
@@ -157,15 +157,15 @@
         const btn = document.getElementById('mainBtn');
         btn.classList.add('is-pressing');
 
-        // 為了完整呈現「慢慢彈起」的諮商視覺，給予足夠的留白時間
+        // 延長等待時間，確保使用者完整體驗「彈起舒展」的動態
         setTimeout(function() {
             document.body.style.transition = "opacity 1.5s ease-in-out";
             document.body.style.opacity = "0";
             
             setTimeout(() => {
                 window.location.href = 'page2.html';
-            }, 1200);
-        }, 1400); // 這裡配合 CSS 的 1.5s 彈起動畫
+            }, 1000);
+        }, 1600); // 配合 1.5s 的回彈時間
     }
 </script>
 
