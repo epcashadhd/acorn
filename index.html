@@ -51,7 +51,7 @@
             letter-spacing: 0.25em; line-height: 1.4;
         }
 
-        /* --- 基礎按鈕設定 --- */
+        /* --- 按鈕基礎：回歸 iPhone 最順暢的狀態 --- */
         .btn-container {
             position: relative;
             display: flex;
@@ -75,8 +75,8 @@
             position: relative;
             z-index: 2;
             
-            /* iPhone/iPad 預設回歸：快速且平滑 */
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.4s;
+            /* iPhone 最順暢的過渡設定 */
+            transition: transform 0.4s ease-out, background-color 0.4s ease;
             animation: btn-breathe 4s infinite ease-in-out;
             -webkit-tap-highlight-color: transparent;
         }
@@ -101,32 +101,29 @@
             100% { transform: scale(1.8); opacity: 0; }
         }
 
-        /* --- 專屬 Mac/滑鼠 (Pointer) 優化：慢慢按、慢慢彈 --- */
+        /* --- iPhone/iPad 專屬狀態：保持極簡、極順 --- */
+        .start-touch-point.is-pressing {
+            animation-play-state: paused;
+            transform: scale(0.85) !important;
+            opacity: 0.8;
+            background-color: rgba(93, 64, 55, 0.3);
+            transition: transform 0.4s ease-out !important; /* iPhone 不需要太慢的曲線 */
+        }
+
+        /* --- 針對 Mac 電腦版：使用專屬 CSS 變量與邏輯 --- */
         @media (hover: hover) and (pointer: fine) {
             .start-touch-point:active {
+                /* 慢慢按落去 */
                 transform: scale(0.9) !important; 
-                transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                transition: transform 0.8s cubic-bezier(0.2, 0.6, 0.3, 1) !important;
             }
 
             .start-touch-point.is-pressing {
+                /* 慢慢彈返起 */
                 transform: scale(0.98) !important;
                 transition: transform 1.2s cubic-bezier(0.12, 0.8, 0.3, 1) !important;
                 background-color: rgba(93, 64, 55, 0.1) !important;
             }
-        }
-
-        /* --- iPhone/iPad 觸控點擊後的狀態：保持原本絲滑 --- */
-        .start-touch-point.is-pressing {
-            animation: none !important;
-            transform: scale(0.85); /* 觸控裝置使用原本滿意的比例 */
-            opacity: 0.8;
-            background-color: rgba(93, 64, 55, 0.3);
-            transition: transform 0.6s ease-out, background-color 0.6s ease;
-        }
-
-        .start-touch-point.is-pressing::after {
-            opacity: 0;
-            transition: opacity 0.4s ease;
         }
     </style>
 </head>
@@ -160,9 +157,11 @@
         const btn = document.getElementById('mainBtn');
         btn.classList.add('is-pressing');
 
-        // 偵測是否為觸控裝置
-        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        const delay = isTouch ? 600 : 1200; // 觸控裝置跳轉稍快(600ms)，Mac保持緩慢(1200ms)
+        // 判斷裝置來決定延遲
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        
+        // iPhone 保持快速反應 (500ms)，Mac 保持輔導風格緩慢反應 (1200ms)
+        const delay = isTouch ? 500 : 1200;
 
         setTimeout(function() {
             document.body.style.transition = "opacity 1s ease";
