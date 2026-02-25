@@ -32,13 +32,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* 使用 space-around 讓頂部和底部留白更自然 */
             justify-content: space-around; 
             padding: env(safe-area-inset-top) 30px calc(20px + env(safe-area-inset-bottom)) 30px;
             box-sizing: border-box;
         }
 
-        /* 放大圖片尺寸，佔據更多視覺空間 */
         .acorn-box {
             width: 60%; 
             max-width: 200px;
@@ -56,24 +54,22 @@
             50% { transform: translateY(-8px) scale(1.04); }
         }
 
-        /* 強化詩句字體與間距 */
         .poem-section {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* 增加行與行的間距 */
+            gap: 15px; 
             color: var(--text-brown);
             text-align: center;
             flex-shrink: 0;
         }
 
         .poem-line {
-            font-size: 26px; /* 顯著放大字體 */
+            font-size: 26px; 
             font-weight: 500;
-            letter-spacing: 0.25em; /* 增加字距讓排版更優雅 */
+            letter-spacing: 0.25em; 
             line-height: 1.4;
         }
 
-        /* 圓形按鈕 */
         .btn-container {
             display: flex;
             justify-content: center;
@@ -81,10 +77,11 @@
             flex-shrink: 0;
         }
 
+        /* 優化後的平滑圓形按鈕 */
         .start-touch-point {
             background-color: var(--btn-transparent);
             border: 1px solid var(--btn-border);
-            width: 85px;  /* 稍微放大一點點按鈕 */
+            width: 85px;  
             height: 85px; 
             border-radius: 50%;
             cursor: pointer;
@@ -96,7 +93,10 @@
             font-family: 'cwTeXYen', sans-serif;
             font-size: 18px;
             position: relative;
+            /* 這裡增加了 transition，讓狀態改變變得很慢很柔 */
+            transition: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
             animation: ripple-breathe 4s infinite ease-in-out;
+            -webkit-tap-highlight-color: transparent; /* 移除行動裝置預設藍色高亮 */
         }
 
         .start-touch-point::after {
@@ -106,6 +106,7 @@
             border-radius: 50%;
             border: 1px solid var(--btn-border);
             animation: ripple-outer 4s infinite ease-out;
+            transition: opacity 0.6s;
         }
 
         @keyframes ripple-breathe {
@@ -118,8 +119,15 @@
             100% { transform: scale(1.8); opacity: 0; }
         }
 
+        /* 當按鈕被按下時，緩慢縮小並加深背景色 */
         .start-touch-point:active {
-            transform: scale(0.92);
+            transform: scale(0.85); /* 稍微縮小多一點 */
+            background-color: rgba(93, 64, 55, 0.35); /* 顏色變深 */
+            border-color: rgba(93, 64, 55, 0.5);
+        }
+
+        .start-touch-point:active::after {
+            opacity: 0; /* 按下時外圈消失，增加專注感 */
         }
     </style>
 </head>
@@ -139,9 +147,18 @@
     </div>
 
     <div class="btn-container">
-        <button class="start-touch-point" onclick="location.href='page7.html'">開始</button>
+        <button class="start-touch-point" onclick="handleStart()">開始</button>
     </div>
 </div>
+
+<script>
+    function handleStart() {
+        // 先執行按鈕動畫的觸覺回饋，延遲 400 毫秒再跳轉
+        setTimeout(function() {
+            window.location.href = 'page7.html';
+        }, 400);
+    }
+</script>
 
 </body>
 </html>
