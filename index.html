@@ -51,7 +51,7 @@
             letter-spacing: 0.25em; line-height: 1.4;
         }
 
-        /* --- 按鈕基礎 --- */
+        /* --- 基礎按鈕設定 --- */
         .btn-container {
             position: relative;
             display: flex;
@@ -75,8 +75,8 @@
             position: relative;
             z-index: 2;
             
-            /* 平時呼吸動畫與恢復原始狀態的曲線 (慢速) */
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease;
+            /* iPhone/iPad 預設回歸：快速且平滑 */
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.4s;
             animation: btn-breathe 4s infinite ease-in-out;
             -webkit-tap-highlight-color: transparent;
         }
@@ -94,7 +94,6 @@
             border: 1px solid var(--btn-border);
             z-index: -1;
             animation: ripple-wave 4s infinite ease-out;
-            transition: opacity 0.8s ease;
         }
 
         @keyframes ripple-wave {
@@ -102,31 +101,32 @@
             100% { transform: scale(1.8); opacity: 0; }
         }
 
-        /* --- 針對 Mac 電腦版修正：慢慢按落去，慢慢彈返起 --- */
-        @media (hover: hover) {
-            /* 慢慢按落去 (MouseDown) */
+        /* --- 專屬 Mac/滑鼠 (Pointer) 優化：慢慢按、慢慢彈 --- */
+        @media (hover: hover) and (pointer: fine) {
             .start-touch-point:active {
                 transform: scale(0.9) !important; 
-                background-color: rgba(93, 64, 55, 0.25);
-                /* 0.8秒緩慢受壓，不突兀 */
-                transition: transform 0.8s cubic-bezier(0.2, 0.6, 0.3, 1);
-                animation-play-state: paused;
+                transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            .start-touch-point.is-pressing {
+                transform: scale(0.98) !important;
+                transition: transform 1.2s cubic-bezier(0.12, 0.8, 0.3, 1) !important;
+                background-color: rgba(93, 64, 55, 0.1) !important;
             }
         }
 
-        /* --- 點擊完成後 (is-pressing)：慢慢彈返起並淡出 --- */
+        /* --- iPhone/iPad 觸控點擊後的狀態：保持原本絲滑 --- */
         .start-touch-point.is-pressing {
-            animation: none !important; 
-            /* 模擬回彈效果：彈回接近原始大小，營造一種鬆了一口氣的感覺 */
-            transform: scale(0.98) !important; 
-            background-color: rgba(93, 64, 55, 0.1);
+            animation: none !important;
+            transform: scale(0.85); /* 觸控裝置使用原本滿意的比例 */
             opacity: 0.8;
-            /* 慢慢彈返起的曲線，持續 1.2 秒 */
-            transition: transform 1.2s cubic-bezier(0.12, 0.8, 0.3, 1), background-color 1.2s ease, opacity 1s ease;
+            background-color: rgba(93, 64, 55, 0.3);
+            transition: transform 0.6s ease-out, background-color 0.6s ease;
         }
-        
+
         .start-touch-point.is-pressing::after {
             opacity: 0;
+            transition: opacity 0.4s ease;
         }
     </style>
 </head>
@@ -158,19 +158,20 @@
         isTransitioning = true;
 
         const btn = document.getElementById('mainBtn');
-        
-        // 加入 class，觸發 CSS 中設定的「慢慢彈起」transition
         btn.classList.add('is-pressing');
 
-        // 延長等待時間，讓「慢慢彈起」的過程被完整看見
+        // 偵測是否為觸控裝置
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const delay = isTouch ? 600 : 1200; // 觸控裝置跳轉稍快(600ms)，Mac保持緩慢(1200ms)
+
         setTimeout(function() {
-            document.body.style.transition = "opacity 1.5s ease";
+            document.body.style.transition = "opacity 1s ease";
             document.body.style.opacity = "0";
             
             setTimeout(() => {
                 window.location.href = 'page2.html';
-            }, 1000);
-        }, 1200); // 這裡的延遲要配合彈起的時間
+            }, 800);
+        }, delay);
     }
 </script>
 
