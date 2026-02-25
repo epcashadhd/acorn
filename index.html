@@ -51,7 +51,7 @@
             letter-spacing: 0.25em; line-height: 1.4;
         }
 
-        /* --- 按鈕基礎：回歸 iPhone 最順暢的狀態 --- */
+        /* --- 核心：諮商風格按鈕 --- */
         .btn-container {
             position: relative;
             display: flex;
@@ -75,8 +75,8 @@
             position: relative;
             z-index: 2;
             
-            /* iPhone 最順暢的過渡設定 */
-            transition: transform 0.4s ease-out, background-color 0.4s ease;
+            /* 讓恢復原狀的過程也變得非常緩慢 (1.5s) */
+            transition: transform 1.5s cubic-bezier(0.2, 0.5, 0.3, 1), background-color 1.2s ease;
             animation: btn-breathe 4s infinite ease-in-out;
             -webkit-tap-highlight-color: transparent;
         }
@@ -94,6 +94,7 @@
             border: 1px solid var(--btn-border);
             z-index: -1;
             animation: ripple-wave 4s infinite ease-out;
+            transition: opacity 1s ease;
         }
 
         @keyframes ripple-wave {
@@ -101,29 +102,28 @@
             100% { transform: scale(1.8); opacity: 0; }
         }
 
-        /* --- iPhone/iPad 專屬狀態：保持極簡、極順 --- */
-        .start-touch-point.is-pressing {
-            animation-play-state: paused;
-            transform: scale(0.85) !important;
-            opacity: 0.8;
-            background-color: rgba(93, 64, 55, 0.3);
-            transition: transform 0.4s ease-out !important; /* iPhone 不需要太慢的曲線 */
+        /* --- 慢慢按下去 (不分裝置) --- */
+        .start-touch-point:active {
+            transform: scale(0.88) !important; 
+            background-color: rgba(93, 64, 55, 0.2) !important;
+            /* 按下去的過程長達 1 秒，營造受壓阻力感 */
+            transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
         }
 
-        /* --- 針對 Mac 電腦版：使用專屬 CSS 變量與邏輯 --- */
-        @media (hover: hover) and (pointer: fine) {
-            .start-touch-point:active {
-                /* 慢慢按落去 */
-                transform: scale(0.9) !important; 
-                transition: transform 0.8s cubic-bezier(0.2, 0.6, 0.3, 1) !important;
-            }
-
-            .start-touch-point.is-pressing {
-                /* 慢慢彈返起 */
-                transform: scale(0.98) !important;
-                transition: transform 1.2s cubic-bezier(0.12, 0.8, 0.3, 1) !important;
-                background-color: rgba(93, 64, 55, 0.1) !important;
-            }
+        /* --- 慢慢彈返起 (放開後) --- */
+        .start-touch-point.is-pressing {
+            animation: none !important; 
+            /* 回彈到幾乎原狀，展現生命力 */
+            transform: scale(1.02) !important; 
+            background-color: rgba(93, 64, 55, 0.12);
+            opacity: 0.8;
+            /* 彈起過程持續 1.5 秒，非常輕柔 */
+            transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.4, 1) !important;
+        }
+        
+        .start-touch-point.is-pressing::after {
+            opacity: 0;
+            transition: opacity 1s ease;
         }
     </style>
 </head>
@@ -157,20 +157,15 @@
         const btn = document.getElementById('mainBtn');
         btn.classList.add('is-pressing');
 
-        // 判斷裝置來決定延遲
-        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        
-        // iPhone 保持快速反應 (500ms)，Mac 保持輔導風格緩慢反應 (1200ms)
-        const delay = isTouch ? 500 : 1200;
-
+        // 為了完整呈現「慢慢彈起」的諮商視覺，給予足夠的留白時間
         setTimeout(function() {
-            document.body.style.transition = "opacity 1s ease";
+            document.body.style.transition = "opacity 1.5s ease-in-out";
             document.body.style.opacity = "0";
             
             setTimeout(() => {
                 window.location.href = 'page2.html';
-            }, 800);
-        }, delay);
+            }, 1200);
+        }, 1400); // 這裡配合 CSS 的 1.5s 彈起動畫
     }
 </script>
 
