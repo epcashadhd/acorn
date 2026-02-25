@@ -10,8 +10,7 @@
         :root {
             --bg-color: #f7f3ed; 
             --text-brown: #5d4037;
-            --btn-transparent: rgba(93, 64, 55, 0.12); 
-            --btn-border: rgba(93, 64, 55, 0.25);
+            --btn-border: rgba(93, 64, 55, 0.2);
         }
 
         html, body {
@@ -21,7 +20,6 @@
             background-color: var(--bg-color);
             font-family: 'cwTeXYen', sans-serif;
             -webkit-font-smoothing: antialiased;
-            touch-action: manipulation;
         }
 
         .phone-container {
@@ -33,34 +31,38 @@
         }
 
         .acorn-box {
-            width: 60%; max-width: 200px;
-            flex-shrink: 0;
-            animation: acorn-breathe 5s ease-in-out infinite;
+            width: 55%; max-width: 190px;
+            animation: acorn-breathe 6s ease-in-out infinite;
         }
-
         .acorn-box img { width: 100%; height: auto; }
 
         @keyframes acorn-breathe {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-8px) scale(1.04); }
+            50% { transform: translateY(-8px) scale(1.03); }
         }
 
         .poem-section {
             display: flex; flex-direction: column;
             gap: 15px; color: var(--text-brown);
-            text-align: center; flex-shrink: 0;
+            text-align: center;
         }
-
         .poem-line {
             font-size: 26px; font-weight: 500;
             letter-spacing: 0.25em; line-height: 1.4;
         }
 
-        /* --- 修正後的按鈕樣式 --- */
+        /* --- 修正後：極致流暢的按鈕 --- */
+        .btn-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .start-touch-point {
-            background-color: var(--btn-transparent);
+            background-color: rgba(93, 64, 55, 0.08);
             border: 1px solid var(--btn-border);
-            width: 85px; height: 85px; 
+            width: 90px; height: 90px; 
             border-radius: 50%;
             cursor: pointer;
             outline: none;
@@ -71,38 +73,52 @@
             font-family: 'cwTeXYen', sans-serif;
             font-size: 18px;
             position: relative;
+            z-index: 2;
             
-            /* 平時的呼吸與縮放過渡 */
-            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-            animation: ripple-breathe 4s infinite ease-in-out;
+            /* 平滑關鍵：所有的變換都共用這個 transition */
+            transition: 
+                transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                background-color 0.8s ease,
+                opacity 0.8s ease;
+            
+            /* 保持持續呼吸 */
+            animation: btn-breathe 4s infinite ease-in-out;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 當點擊生效時（由 JS 控制） */
-        .start-touch-point.is-pressing {
-            transform: scale(0.7) !important;
-            background-color: rgba(93, 64, 55, 0.4);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        @keyframes ripple-breathe {
+        @keyframes btn-breathe {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.08); }
         }
 
+        /* 波紋動畫 */
         .start-touch-point::after {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 50%;
             border: 1px solid var(--btn-border);
-            animation: ripple-outer 4s infinite ease-out;
+            z-index: -1;
+            animation: ripple-wave 4s infinite ease-out;
+            transition: opacity 0.5s ease;
         }
 
-        @keyframes ripple-outer {
+        @keyframes ripple-wave {
             0% { transform: scale(1); opacity: 0.6; }
             100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        /* --- 點擊後的狀態修正 --- */
+        /* 使用更加平滑的 transform 與取消動畫的方式 */
+        .start-touch-point.is-pressing {
+            animation-play-state: paused; /* 停止呼吸動畫在當前位置，不再跳轉 */
+            transform: scale(0.85) !important;
+            background-color: rgba(93, 64, 55, 0.3);
+            transition: transform 0.6s ease-out, background-color 0.6s ease;
+        }
+        
+        .start-touch-point.is-pressing::after {
+            opacity: 0; /* 讓波紋平滑消失 */
         }
     </style>
 </head>
@@ -122,7 +138,7 @@
     </div>
 
     <div class="btn-container">
-        <button id="startBtn" class="start-touch-point" onclick="handleStart()">開始</button>
+        <button id="mainBtn" class="start-touch-point" onclick="handleStart()">開始</button>
     </div>
 </div>
 
@@ -130,19 +146,23 @@
     let isTransitioning = false;
 
     function handleStart() {
-        if (isTransitioning) return; // 防止重複點擊
+        if (isTransitioning) return;
         isTransitioning = true;
 
-        const btn = document.getElementById('startBtn');
+        const btn = document.getElementById('mainBtn');
         
-        // 1. 立即觸發視覺縮放
+        // 加上 class 觸發平滑收縮
         btn.classList.add('is-pressing');
 
-        // 2. 延長延遲到 800ms，讓 iPhone 使用者有「安頓感」
-        // 這段時間包含了縮放動畫與停留感
+        // 延遲跳轉
         setTimeout(function() {
-            window.location.href = 'page2.html'; // 根據你的描述，這裡應該是跳轉到 Page 2
-        }, 800);
+            document.body.style.transition = "opacity 1s ease";
+            document.body.style.opacity = "0";
+            
+            setTimeout(() => {
+                window.location.href = 'page2.html';
+            }, 800);
+        }, 700);
     }
 </script>
 
